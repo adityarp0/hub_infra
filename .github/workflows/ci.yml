@@ -19,6 +19,7 @@ jobs:
     name: Terraform Validation & Security
     runs-on: ubuntu-latest
 
+
     defaults:
       run:
         working-directory: terraform
@@ -47,7 +48,7 @@ jobs:
       - name: Run TFLint
         run: |
           tflint --init
-          tflint --recursive || true 
+          tflint --recursive || true
 
       - name: Run tfsec Security Scan
         uses: aquasecurity/tfsec-action@v1.0.3
@@ -60,14 +61,30 @@ jobs:
           directory: terraform
           framework: terraform
 
+
   configuration-validation:
     name: Configuration Validation
     runs-on: ubuntu-latest
+
 
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v4
 
+      - name: Validate Docker Compose File
+        run: docker compose config
+
       - name: Validate Mosquitto Configuration Exists
-        run: |
-          test -f mosquitto/mosquitto.conf
+        run: test -f mosquitto/mosquitto.conf
+
+      - name: Validate Nginx Configuration Exists
+        run: test -f nginx/nginx.conf
+
+      - name: Validate Nginx Dockerfile Exists
+        run: test -f nginx/Dockerfile
+
+      - name: Build Nginx Image
+        run: docker build -t cixiohub-nginx ./nginx
+
+      - name: Validate Nginx Configuration Syntax
+        run: docker run --rm cixiohub-nginx nginx -t
