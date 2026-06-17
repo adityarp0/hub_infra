@@ -1,3 +1,0 @@
-httpx
-paho-mqtt
-python-dotenv
